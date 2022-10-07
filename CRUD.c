@@ -1,7 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include "CRUD.h"
+
+int my_socket;
+
+void set_socket(int s) {
+    my_socket = s;
+}
+
+void send_message(char const *message) {
+    //printf("El mensaje a enviar es: %s", message);
+    if (send(my_socket, message, strlen(message), 0) == -1)
+        perror("Server-send() error");
+}
+
+void send_error(char const *error) {
+    send_message(error);
+}
 
 int string_to_int(char const *number) {
     return (int) strtol(number, NULL, 10);
@@ -12,7 +29,7 @@ void create_table(char const *name, char const *columns) {
     file = fopen(name, "wt");
     fprintf(file, "%s\n", columns);
     fclose(file);
-    printf("[-] Table created\n");
+    send_message("[-] Table created\n");
 }
 
 void insert_values(char const *table, char const *values) {
@@ -34,19 +51,21 @@ void insert_values(char const *table, char const *values) {
     }
     fprintf(file, "%d,%s\n", id, values);
     fclose(file);
-    printf("[-] Record added\n");
+    send_message("[-] Record added\n");
 }
 
 void select_all(char const *table) {
     FILE* file;
     char line[200];
     file = fopen(table, "rt");
+    printf("Estamos en SELECT");
     fgets(line, 200, file);
-    printf("\n-------------------------------------------------------\n");
-    printf("%s", line);
-    printf("-------------------------------------------------------\n");
+    send_message("\n-------------------------------------------------------\n");
+    send_message(line);
+    send_message("-------------------------------------------------------\n");
     while (fgets(line, 200, file) != NULL) {
-        printf("%s\n", line);
+        send_message(line);
+        send_message("\n");
     }
     fclose(file);
 }
@@ -99,7 +118,7 @@ void update_record(
                         if (i == column_exists)
                         {
                             fprintf(temp, ",%s", new_value);
-                            printf("[-] Record updated\n");
+                            send_message("[-] Record updated\n");
                         } else {
                             fprintf(temp, ",%s", token_value);
                         }
@@ -112,16 +131,16 @@ void update_record(
             }
             if (num_line < id)
             {
-                printf("[-] Operation update failed <Id doesn't exist>\n");
+                send_message("[-] Operation update failed <Id doesn't exist>\n");
             }
             
             remove(table);
             rename("temp", table);
         } else {
-            printf("[-] Operation update failed <Column doesn't exist>\n");
+            send_message("[-] Operation update failed <Column doesn't exist>\n");
         }
     } else {
-        printf("[-] Operation update failed <Invalid id>\n");
+        send_message("[-] Operation update failed <Invalid id>\n");
     }
     fclose(file);
     fclose(temp);
@@ -145,7 +164,7 @@ void delete_record(char const *table, char const *where) {
             {
                 fputs(line, temp);
             } else
-                printf("[-] Record deleted\n");
+                send_message("[-] Record deleted\n");
             num_line++;
             has_next_line = fgets(line, 200, file);
         }

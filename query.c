@@ -4,13 +4,14 @@
 #include "query.h"
 #include "CRUD.h"
 
-void define_operation(char query[]) {
+void define_operation(char query[], int socket) {
     char* piece;
     char* table_name;
     char* values;
     char* column;
     char* column_name;
     char* id;
+    set_socket(socket);
     piece = strtok(query, " ");
     if (strcmp(piece, "CREATE") == 0) {
         for (int i = 0; i < 3; i++)
@@ -27,7 +28,7 @@ void define_operation(char query[]) {
             }
         }
         memmove(&values[0], &values[1], strlen(values));
-        values[strlen(values)-1] = '\0';
+        values[strlen(values)-2] = '\0';
         create_table(table_name, values);
     }
     else if(strcmp(piece, "INSERT") == 0) {
@@ -45,7 +46,7 @@ void define_operation(char query[]) {
             }
         }
         memmove(&values[0], &values[1], strlen(values));
-        values[strlen(values)-1] = '\0';
+        values[strlen(values)-2] = '\0';
         insert_values(table_name, values);
     }
     else if(strcmp(query, "UPDATE") == 0) {
@@ -87,6 +88,7 @@ void define_operation(char query[]) {
                 strtok(NULL, " ");
             }
         }
+        printf(table_name);
         select_all(table_name);
     }
     else if(strcmp(query, "DELETE") == 0) {
@@ -110,10 +112,8 @@ void define_operation(char query[]) {
         //printf(strtok(NULL, "="));
         delete_record(table_name, strtok(NULL, "="));
     }
-    else if(strcmp(query, "SALIR") == 0) {
-        exit(0);
-    } else 
-        perror("[-] Unrecognized command\n");
+    else 
+        send_error("[-] Unrecognized command\n");
 }
 
 /*

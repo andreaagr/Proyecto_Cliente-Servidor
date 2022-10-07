@@ -1,7 +1,6 @@
 /*
  ** server.c -- Ejemplo de servidor de sockets de flujo
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -48,7 +47,7 @@ void create_socket() {
 
 void bind_socket() {
     struct sockaddr_in my_addr;     // Información sobre mi dirección
-    char *ip = "127.0.0.1";
+    char *ip = "192.168.0.141";
     
     my_addr.sin_family = AF_INET;               // Ordenación de bytes de la máquina
     my_addr.sin_port = htons(MYPORT);           // short, Ordenación de bytes de la red
@@ -101,12 +100,6 @@ void accept_socket() {
 
 }
 
-void send_message(int sockfd, char const *message) {
-    printf("El mensaje a enviar es: %s", message);
-    if (send(new_fd, message, strlen(message), 0) == -1)
-        perror("Server-send() error lol!");
-}
-
 void receive_message() {
     int numbytes; 
     char buf[MAXDATASIZE];
@@ -119,7 +112,7 @@ void receive_message() {
       
     buf[numbytes] = '\0';
     printf("Servidor-Received: %s", buf);
-    define_operation(buf);
+    define_operation(buf, new_fd);
 }
 
 int main(int argc, char *argv[])
@@ -136,26 +129,14 @@ int main(int argc, char *argv[])
         accept_socket();
         if (!fork()) { // Este es el proceso hijo
             close(sockfd); // El hijo no necesita este descriptor
-            /*if((numbytes = recv(new_fd, buf, MAXDATASIZE-1, 0)) == -1)  {
-                perror("recv()");
-                exit(1);
-            } else
-                printf("Servidor-The recv() is OK...\n");
-            buf[numbytes] = '\0';
-            printf("Servidor-Received: %s", buf);*/
             while (1)
             {
-                /* code */
-                //define_operation(receive_message(), new_fd);
                 receive_message();
             }
-            
-            
-            //define_operation(, new_fd);
         }
-        //printf("Este es el proceso padre, cierra el descriptor del socket cliente y se regresa a esperar otro cliente\n");
-        //close(new_fd);  // El proceso padre no necesita este descriptor
-        //printf("Server-new socket, new_fd closed successfully...\n");
+        printf("Este es el proceso padre, cierra el descriptor del socket cliente y se regresa a esperar otro cliente\n");
+        close(new_fd);  // El proceso padre no necesita este descriptor
+        printf("Server-new socket, new_fd closed successfully...\n");
     }
 
     return 0;
