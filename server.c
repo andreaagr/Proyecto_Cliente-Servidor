@@ -1,5 +1,6 @@
 /*
- ** server.c -- Ejemplo de servidor de sockets de flujo
+    Modificado por Andrea Garcia Ruiz, el 4 de octubre de 2022 
+    server.c -- Ejemplo de servidor de sockets de flujo
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,7 +47,7 @@ void create_socket() {
 }
 
 void bind_socket() {
-    struct sockaddr_in my_addr;     // Información sobre mi dirección
+    struct sockaddr_in my_addr;                 // Información sobre mi dirección
     char *ip = "192.168.0.141";
     
     my_addr.sin_family = AF_INET;               // Ordenación de bytes de la máquina

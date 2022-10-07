@@ -1,3 +1,8 @@
+/*
+    Modificado por Andrea Garcia Ruiz, el 7 de octubre de 2022 
+    client.c -- Ejemplo de cliente para sockets de flujo
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -20,7 +25,9 @@ struct hostent *he;
 int sockfd;
 
 char* ip_address;
-
+/*
+  Obtiene la informacion del servidor al que nos estamos conectando
+*/
 void get_host_info() {
   if((he = gethostbyname(ip_address)) == NULL)
   {
@@ -61,7 +68,6 @@ void connect_socket() {
 }
 
 void send_message(char const *message) {
-  //printf("El mensaje a enviar es: %s", message);
   if (send(sockfd, message, strlen(message), 0) == -1)
     perror("Server-send() error");
 }
@@ -86,12 +92,13 @@ int main(int argc, char *argv[])
 {
   int salir = 1;
   char linea1[LINE_MAX];
-  
+  // Si no enviamos como parametro la direccion ip del servidor, lanza un error
   if(argc != 2)
   {
     fprintf(stderr, "Client-Usage: %s hostname_del_servidor\n", argv[0]);
     exit(1);
   }
+  // ---------------------------------------------------------------------------
   ip_address = argv[1];
   get_host_info();
   create_socket();
@@ -107,7 +114,8 @@ int main(int argc, char *argv[])
       printf("Client-Closing sockfd\n");
       close(sockfd);
       return 0;
-    } else {
+    }  else
+    {
       receive_message();
     }
   }

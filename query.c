@@ -1,9 +1,25 @@
+/*
+    Creado por Andrea Garcia Ruiz, el 05/10/2022
+    
+    Las funciones descritas en este archivo separan la sentencia SQL y llaman a las operaciones CRUD
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "query.h"
 #include "CRUD.h"
+/*
+    Dependiendo de la operacion deseada se recuperan los parametros necesarios. 
 
+    La sintaxis sobre la que se basa es la siguiente:
+
+    CREATE -> CREATE nombre_tabla (columna1, columna2, ...)
+    INSERT -> INSERT INTO nombre_tabla VALUES (valor1, valor2, ...)
+    UPDATE -> UPDATE nombre_tabla SET nombre_columna=nuevo_valor WHERE ID=id_registro
+    DELETE -> DELETE FROM nombre_tabla WHERE ID=id_registro
+    SELECT -> SELECT * FROM nombre_tabla
+*/
 void define_operation(char query[], int socket) {
     char* piece;
     char* table_name;
@@ -70,10 +86,6 @@ void define_operation(char query[], int socket) {
         column_name = strtok(column, "=");
         values = strtok(NULL, "=");
         strtok(id, "=");
-        //printf(table_name);
-        //printf(column_name);
-        //printf(strtok(NULL, "="));
-        //printf(values);
         update_record(table_name, column_name, values, strtok(NULL, "="));
     }
     else if(strcmp(query, "SELECT") == 0) {
@@ -88,8 +100,8 @@ void define_operation(char query[], int socket) {
                 strtok(NULL, " ");
             }
         }
-        printf(table_name);
-        select_all(table_name);
+        select_all(strtok(table_name, "\n"));
+        
     }
     else if(strcmp(query, "DELETE") == 0) {
         for (int i = 0; i < 4; i++)
@@ -113,15 +125,5 @@ void define_operation(char query[], int socket) {
         delete_record(table_name, strtok(NULL, "="));
     }
     else 
-        send_error("[-] Unrecognized command\n");
+        send_message("[-] Unrecognized command\n");
 }
-
-/*
-int main() {
-    //char es[122] = "INSERT INTO TIENDA VALUES (G,K,G,O,H)";
-    //char es[122] = "CREATE TABLE TIENDA (G,K,G,O,H)";
-    //char es[122] = "UPDATE Alumno SET Apellido=Gomez WHERE Id=2";
-    //char es[122] = "SELECT * FROM ALUMNO";
-    //char es[122] = "DELETE FROM Alumno WHERE ID=7";
-    define_operation(es);
-}*/
