@@ -190,31 +190,41 @@ void delete_record(char const *table, char const *where) {
     FILE* file;
     FILE* temp;
     char line[200];
-    int id, num_line = 0;
+    char full_line[200];
+    int id;
     char* has_next_line;
-    file = fopen(table, "rt");
-    temp = fopen("temp", "wt");
+    int record_updated = 0;
     id = string_to_int(where);
 
     if (id > 0)
     {
+        file = fopen(table, "rt");
+        temp = fopen("temp", "wt");
         has_next_line = fgets(line, 200, file);
         // Itera sobre todos los registros de la tabla
         while (has_next_line != NULL) {
+            strcpy(full_line, line);
             // Si la linea no se quiere borrar, se manda a temp
-            if (num_line != id)
+            if (string_to_int(strtok(line, ",")) != id)
             {
-                fputs(line, temp);
+                fputs(full_line, temp);
             } else
-                send_message("[-] Record deleted\n");
-            num_line++;
+                record_updated = 1;
             has_next_line = fgets(line, 200, file);
         }
+
+        if (record_updated == 1)
+        {
+            send_message("[-] Record deleted\n");
+        } else
+            send_message("[-] Operation delete failed <Id doesn't exist>\n");
+        // Elimina la tabla original
+        remove(table);
+        // Temp se convierte en la tabla actualizada
+        rename("temp", table);
+        fclose(file);
+        fclose(temp);
+    } else {
+        send_message("[-] Operation delete failed <Invalid id>\n");
     }
-    fclose(file);
-    fclose(temp);
-    // Elimina la tabla original
-    remove(table);
-    // Temp se convierte en la tabla actualizada
-    rename("temp", table);
 }
