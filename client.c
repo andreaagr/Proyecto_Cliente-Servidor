@@ -25,6 +25,7 @@ struct hostent *he;
 int sockfd;
 
 char* ip_address;
+
 /*
   Obtiene la informacion del servidor al que nos estamos conectando
 */

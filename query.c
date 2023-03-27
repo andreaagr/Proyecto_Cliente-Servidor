@@ -119,9 +119,6 @@ void define_operation(char query[], int socket) {
             }
         }
         strtok(id, "=");
-        //printf(id);
-        //printf(table_name);
-        //printf(strtok(NULL, "="));
         delete_record(table_name, strtok(NULL, "="));
     }
     else 

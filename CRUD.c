@@ -44,6 +44,7 @@ void create_table(char const *name, char const *columns) {
     fclose(file);
     send_message("[-] Table created\n");
 }
+
 /*
     Agrega un nuevo registro al final del archivo, incrementando el valor del ultimo id
 */
@@ -91,12 +92,7 @@ void select_all(char const *table) {
     fclose(file);
 }
 
-void update_record(
-    char const *table, 
-    char const *column, 
-    char const *new_value, 
-    char const *where
-) {
+void update_record(char const *table, char const *column, char const *new_value, char const *where) {
     FILE* file;
     FILE* temp;
     char line[200];
@@ -105,6 +101,7 @@ void update_record(
     char* line_sin_salto;
     char* token_column;
     char* token_value;
+    char* current_id;
     int num_line = 1, column_exists = -1, id, first_time = 1, num_column = 0;
     // Archivo del que leemos el contenido de la tabla
     file = fopen(table, "rt");
@@ -112,8 +109,7 @@ void update_record(
     temp = fopen("temp", "wt");
     id = string_to_int(where);
     if(id > 0) {
-        if (strcmp(column, "Id") == 0)
-        {
+        if (strcmp(column, "Id") == 0) {
             send_message("[-] Operation update failed <Id cannot be updated\n");
         } else {
             // Obtiene las columnas de la tabla
@@ -124,8 +120,7 @@ void update_record(
             table_st_sin_salto = strtok(table_structure, "\n");
             // Separa la cadena por comas y guarda en token_column el nombre de la primera columna
             token_column = strtok(table_st_sin_salto, ",");
-            while (token_column != NULL)
-            {
+            while (token_column != NULL) {
                 // Compara el nombre de la columna con el que dio el usuario y guarda el numero de columna
                 if(strcmp(token_column, column) == 0) {
                     column_exists = num_column;
@@ -135,23 +130,19 @@ void update_record(
                 token_column = strtok(NULL, ",");
             }
 
-            if (column_exists != -1)
-            {
+            if (column_exists != -1) {
                 // Itera sobre todos los registros guardado en el archivo
                 while (fgets(line, 200, file) != NULL)
                 {
                     // Quita el salto de linea de cada linea del archivo
                     line_sin_salto = strtok(line, "\n");
-                    if (num_line == id)
-                    {
+                    if (num_line == id) {
                         token_value = strtok(line_sin_salto, ",");
                         fprintf(temp, "%d", id);
                         // Itera sobre todas las columnas de la linea
-                        for (int i = 1; i < num_column; i++)
-                        {
+                        for (int i = 1; i < num_column; i++) {
                             token_value = strtok(NULL, ",");
-                            if (i == column_exists)
-                            {
+                            if (i == column_exists) {
                                 // Cuando la columna coincide con la especificada, coloca el nuevo valor
                                 fprintf(temp, ",%s", new_value);
                                 send_message("[-] Record updated\n");
@@ -166,8 +157,7 @@ void update_record(
                     }
                     num_line++;
                 }
-                if (num_line < id)
-                {
+                if (num_line-1 < id) {
                     send_message("[-] Operation update failed <Id doesn't exist>\n");
                 }
                 // Cuando hay cambios...

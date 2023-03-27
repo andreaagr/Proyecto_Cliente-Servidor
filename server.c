@@ -48,7 +48,7 @@ void create_socket() {
 
 void bind_socket() {
     struct sockaddr_in my_addr;                 // Información sobre mi dirección
-    char *ip = "192.168.0.141";
+    char *ip = "127.0.0.1";
     
     my_addr.sin_family = AF_INET;               // Ordenación de bytes de la máquina
     my_addr.sin_port = htons(MYPORT);           // short, Ordenación de bytes de la red
